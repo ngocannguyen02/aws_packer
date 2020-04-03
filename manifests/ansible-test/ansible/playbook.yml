@@ -1,0 +1,6 @@
+---
+
+- hosts: all
+  pre_tasks:
+  - name: Installating the Galaxy Roles
+    local_action: command ansible-galaxy install -r {{ playbook_dir }}/requirements.yml -f -p {{ playbook_dir }}/roles/

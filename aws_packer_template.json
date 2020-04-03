@@ -1,0 +1,40 @@
+{
+    "variables": {
+        "aws_access_key": "<your_aws_key>",
+        "aws_secret_key": "<your_secret_key>",
+        "ansible_playbook": "manifests/ansible-test/ansible/playbook.yml",
+        "ansible_repository": "local",
+        "region": "<aws_region>"
+    },
+    "builders": [
+        {
+            "access_key": "{{user `aws_access_key`}}",
+            "ami_name": "packer-linux-aws-demo-{{timestamp}}",
+            "instance_type": "t2.micro",
+            "region": "{{user `region`}}",
+            "secret_key": "{{user `aws_secret_key`}}",
+            "source_ami_filter": {
+              "filters": {
+              "virtualization-type": "hvm",
+              "name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+              "root-device-type": "ebs"
+              },
+              "owners": ["099720109477"],
+              "most_recent": true
+            },
+            "ssh_username": "ubuntu",
+            "type": "amazon-ebs"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell-local",
+            "command": "if [ \"{{user `ansible_repository`}}\" != \"local\" ]; then git clone {{user `ansible_repository`}}; fi"
+        },
+        {
+            "type": "ansible",
+            "playbook_file": "{{user `ansible_playbook`}}",
+            "user": "{{user `ssh_username`}}"
+        }
+    ]
+}
